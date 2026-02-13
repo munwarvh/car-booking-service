@@ -1,6 +1,6 @@
 # Car Rental Booking Service
 
-A production-grade car rental booking service built with Spring Boot for Velocity Motors.
+A car rental booking service built with Spring Boot for Velocity Motors.
 
 ## Features
 
@@ -9,10 +9,28 @@ A production-grade car rental booking service built with Spring Boot for Velocit
 - **Kafka Integration**: Listens for bank transfer payment events
 - **Automatic Cancellation**: Unpaid bank transfer bookings cancelled 48 hours before rental start
 - **Circuit Breaker**: Resilience4j for external service calls
+- **Distributed Locking**: ShedLock for scheduled task coordination
+- **Database Migrations**: Flyway for version-controlled schema changes
+- **API Documentation**: OpenAPI/Swagger UI
+
+## Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Language | Java 21 |
+| Framework | Spring Boot 3.5.10 |
+| Build Tool | Gradle 8.x |
+| Database | PostgreSQL (prod), H2 (dev) |
+| Messaging | Apache Kafka |
+| Caching | Redis |
+| Resilience | Resilience4j (Circuit Breaker, Retry) |
+| Documentation | SpringDoc OpenAPI |
+| Testing | JUnit 5, Testcontainers, Awaitility |
+| Containerization | Docker & Docker Compose |
 
 ## Prerequisites
 
-- Java 17+
+- Java 21+
 - Docker & Docker Compose
 - Gradle 8.x (or use the included wrapper)
 
