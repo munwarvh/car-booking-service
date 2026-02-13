@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/payment-status",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": {
+          "expression": "$.paymentReference",
+          "contains": "REJECT"
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "lastUpdateDate": "{{now}}",
+      "status": "REJECTED"
+    },
+    "transformers": ["response-template"]
+  },
+  "priority": 1
+}
+

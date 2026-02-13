@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/payment-status",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$.paymentReference"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "lastUpdateDate": "{{now}}",
+      "status": "APPROVED"
+    },
+    "transformers": ["response-template"]
+  },
+  "priority": 5
+}
+
