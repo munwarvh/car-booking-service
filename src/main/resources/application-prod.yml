@@ -35,6 +35,7 @@ app:
   external-services:
     credit-card-validation:
       url: ${CREDIT_CARD_SERVICE_URL}
+      base-path: /host/credit-card-payment-api
       timeout: 3000
 
 logging:

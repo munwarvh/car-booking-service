@@ -43,6 +43,7 @@ import static org.awaitility.Awaitility.await;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @DisplayName("Car Booking Service Integration Tests")
+@Tag("integration")
 class BookingIntegrationTest {
 
     @Container
@@ -410,4 +411,3 @@ class BookingIntegrationTest {
         return new KafkaTemplate<>(producerFactory);
     }
 }
-

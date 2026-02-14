@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "url": "/payment-status",
+    "url": "/host/credit-card-payment-api/payment-status",
     "bodyPatterns": [
       {
         "matchesJsonPath": "$.paymentReference"
@@ -21,4 +21,3 @@
   },
   "priority": 5
 }
-

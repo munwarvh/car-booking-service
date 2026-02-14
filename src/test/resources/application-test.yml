@@ -41,6 +41,7 @@ app:
   external-services:
     credit-card-validation:
       url: http://localhost:9999
+      base-path: /host/credit-card-payment-api
       timeout: 1000
 
   scheduler:
@@ -50,4 +51,3 @@ logging:
   level:
     root: WARN
     com.velocity.carservice: DEBUG
-

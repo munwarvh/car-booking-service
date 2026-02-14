@@ -38,6 +38,7 @@ app:
   external-services:
     credit-card-validation:
       url: http://localhost:9090
+      base-path: /host/credit-card-payment-api
 
 logging:
   level:

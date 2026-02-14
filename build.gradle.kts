@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "3.5.10"
     id("io.spring.dependency-management") version "1.1.4"
     id("jacoco")
+    id("org.openapi.generator") version "7.4.0"
 }
 
 group = "com.velocity"
@@ -68,6 +69,10 @@ dependencies {
     // OpenAPI Documentation
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
 
+    // OpenAPI Generator dependencies
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
+
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.kafka:spring-kafka-test")
@@ -79,8 +84,28 @@ dependencies {
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        // Exclude integration tests by default (they require Docker)
+        excludeTags("integration")
+    }
     finalizedBy(tasks.jacocoTestReport)
+}
+
+// Separate task for integration tests (requires Docker to be running)
+tasks.register<Test>("integrationTest") {
+    description = "Runs integration tests (requires Docker)"
+    group = "verification"
+    useJUnitPlatform {
+        includeTags("integration")
+    }
+    shouldRunAfter(tasks.test)
+}
+
+// Task to run all tests including integration tests
+tasks.register<Test>("allTests") {
+    description = "Runs all tests including integration tests (requires Docker)"
+    group = "verification"
+    useJUnitPlatform()
 }
 
 tasks.jacocoTestReport {
@@ -114,4 +139,34 @@ tasks.jacocoTestCoverageVerification {
             }
         }
     }
+}
+
+// OpenAPI Generator configuration
+openApiGenerate {
+    generatorName.set("java")
+    inputSpec.set("${rootDir}/src/main/resources/openapi/creditcardpayment_api.yml")
+    outputDir.set(layout.buildDirectory.dir("generated/openapi").get().asFile.absolutePath)
+    apiPackage.set("com.velocity.carservice.infrastructure.adapter.outbound.creditcard.api")
+    modelPackage.set("com.velocity.carservice.infrastructure.adapter.outbound.creditcard.model")
+    invokerPackage.set("com.velocity.carservice.infrastructure.adapter.outbound.creditcard")
+    configOptions.set(mapOf(
+        "library" to "webclient",
+        "useJakartaEe" to "true",
+        "dateLibrary" to "java8",
+        "openApiNullable" to "false",
+        "useSpringBoot3" to "true",
+        "serializationLibrary" to "jackson"
+    ))
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir(layout.buildDirectory.dir("generated/openapi/src/main/java"))
+        }
+    }
+}
+
+tasks.compileJava {
+    dependsOn(tasks.openApiGenerate)
 }
