@@ -134,7 +134,7 @@ class BookingControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableEntity())
-                    .andExpect(jsonPath("$.errorCode").value("PAYMENT_FAILED"));
+                    .andExpect(jsonPath("$.errorCode").value("PAYMENT_REJECTED"));
         }
 
         @Test
@@ -224,4 +224,3 @@ class BookingControllerTest {
         }
     }
 }
-

@@ -26,4 +26,8 @@ public interface BookingRepository {
     boolean existsByBookingId(String bookingId);
 
     void deleteById(UUID id);
+
+    int batchUpdateStatus(List<String> bookingIds, BookingStatus newStatus);
+
+    List<String> findBookingIdsForAutoCancellation(int daysBeforeRental);
 }

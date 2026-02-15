@@ -16,6 +16,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookingRepositoryImpl implements BookingRepository {
 
+    private static final int AUTO_CANCEL_DAYS_BEFORE_RENTAL = 2;
+
     private final JpaBookingRepository jpaBookingRepository;
 
     @Override
@@ -56,5 +58,19 @@ public class BookingRepositoryImpl implements BookingRepository {
     @Override
     public void deleteById(UUID id) {
         jpaBookingRepository.deleteById(id);
+    }
+
+    @Override
+    public int batchUpdateStatus(List<String> bookingIds, BookingStatus newStatus) {
+        if (bookingIds == null || bookingIds.isEmpty()) {
+            return 0;
+        }
+        return jpaBookingRepository.batchUpdateStatus(bookingIds, newStatus);
+    }
+
+    @Override
+    public List<String> findBookingIdsForAutoCancellation(int daysBeforeRental) {
+        LocalDate deadline = LocalDate.now().plusDays(daysBeforeRental);
+        return jpaBookingRepository.findBookingIdsForAutoCancellation(deadline);
     }
 }
