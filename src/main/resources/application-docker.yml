@@ -1,10 +1,10 @@
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: docker
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/car_booking_db
+    url: jdbc:postgresql://postgres:5432/car_booking_db
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -13,6 +13,7 @@ spring:
       minimum-idle: 5
       idle-timeout: 300000
       connection-timeout: 20000
+      max-lifetime: 1200000
 
   jpa:
     hibernate:
@@ -22,21 +23,22 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:29092
+    consumer:
+      group-id: car-booking-service
 
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
 
 app:
   external-services:
     credit-card-validation:
-      url: http://localhost:9090
+      url: http://mock-credit-card-service:8081
 
 logging:
   level:
     root: INFO
-    com.velocity.carservice: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.velocity.carservice: INFO
+    org.springframework.web: INFO

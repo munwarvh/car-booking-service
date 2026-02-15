@@ -7,10 +7,16 @@ info:
 servers:
   - url: http://localhost:9090/host/credit-card-payment-api
 
+tags:
+  - name: CreditCardValidation
+    description: Credit card payment validation operations
+
 paths:
   /payment-status:
     post:
-      operationId: getPaymentStatus
+      tags:
+        - CreditCardValidation
+      operationId: validatePaymentStatus
       summary: retrieve payment status
       description: Accepts payment reference and provides the status of the payment
       requestBody:
@@ -83,4 +89,3 @@ components:
         error:
           type: string
           description: Error message
-

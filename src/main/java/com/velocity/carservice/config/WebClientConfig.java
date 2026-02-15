@@ -44,14 +44,10 @@ public class WebClientConfig {
     }
 
     private ExchangeFilterFunction logRequest() {
-        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
-            return Mono.just(clientRequest);
-        });
+        return ExchangeFilterFunction.ofRequestProcessor(Mono::just);
     }
 
     private ExchangeFilterFunction logResponse() {
-        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
-            return Mono.just(clientResponse);
-        });
+        return ExchangeFilterFunction.ofResponseProcessor(Mono::just);
     }
 }

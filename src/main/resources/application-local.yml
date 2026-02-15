@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: local
 
   datasource:
     url: jdbc:postgresql://localhost:5432/car_booking_db
@@ -39,4 +39,4 @@ logging:
     root: INFO
     com.velocity.carservice: DEBUG
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+

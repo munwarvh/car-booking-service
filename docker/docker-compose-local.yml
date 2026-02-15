@@ -1,10 +1,43 @@
 version: '3.8'
 
-# Lightweight docker-compose for local development
-# Only starts infrastructure services (Postgres, Kafka, Redis, WireMock)
-# Run the Spring Boot app locally with: ./gradlew bootRun
+name: car-booking-app
 
 services:
+  # Car Booking Service Application
+  car-booking-service:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: car-booking-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/car_booking_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - CREDIT_CARD_SERVICE_BASE_URL=http://mock-credit-card-service:8081
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      mock-credit-card-service:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+    networks:
+      - car-booking-network
+
   # Mock Credit Card Validation Service using WireMock
   mock-credit-card-service:
     image: wiremock/wiremock:3.3.1
@@ -104,4 +137,3 @@ networks:
 volumes:
   postgres_data:
   redis_data:
-
