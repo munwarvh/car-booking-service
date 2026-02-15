@@ -25,4 +25,20 @@ public class CustomExceptions {
             super(message);
         }
     }
+
+    public static class UnsupportedPaymentModeException extends RuntimeException {
+        public UnsupportedPaymentModeException(String message) {
+            super(message);
+        }
+    }
+
+    public static class CreditCardServiceUnavailableException extends RuntimeException {
+        public CreditCardServiceUnavailableException(String message) {
+            super(message);
+        }
+
+        public CreditCardServiceUnavailableException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
 }

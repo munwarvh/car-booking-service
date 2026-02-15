@@ -2,11 +2,12 @@ package com.velocity.carservice.application.service;
 
 import com.velocity.carservice.application.dto.request.BookingRequestDTO;
 import com.velocity.carservice.application.dto.response.BookingResponseDTO;
+import com.velocity.carservice.application.strategy.PaymentStrategy;
+import com.velocity.carservice.application.strategy.PaymentStrategyFactory;
 import com.velocity.carservice.domain.model.Booking;
 import com.velocity.carservice.domain.model.BookingStatus;
 import com.velocity.carservice.domain.repository.BookingRepository;
 import com.velocity.carservice.domain.service.BookingDomainService;
-import com.velocity.carservice.infrastructure.adapter.outbound.rest.CreditCardValidationClient;
 import com.velocity.carservice.infrastructure.exception.CustomExceptions.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final BookingDomainService bookingDomainService;
-    private final CreditCardValidationClient creditCardValidationClient;
+    private final PaymentStrategyFactory paymentStrategyFactory;
 
     public BookingResponseDTO confirmBooking(BookingRequestDTO request) {
         log.info("Processing booking request for customer: {}, payment mode: {}",
@@ -52,8 +53,9 @@ public class BookingService {
                 .amountReceived(BigDecimal.ZERO)
                 .build();
 
-        // Process based on payment mode
-        BookingStatus status = processPaymentAndDetermineStatus(booking, request);
+        // Process payment using Strategy pattern
+        PaymentStrategy paymentStrategy = paymentStrategyFactory.getStrategy(request.paymentMode());
+        BookingStatus status = paymentStrategy.processPayment(booking, request.paymentReference());
         booking.setStatus(status);
 
         // Save booking
@@ -61,33 +63,6 @@ public class BookingService {
         log.info("Booking {} created with status: {}", savedBooking.getBookingId(), savedBooking.getStatus());
 
         return new BookingResponseDTO(savedBooking.getBookingId(), savedBooking.getStatus());
-    }
-
-    /**
-     * Process payment based on payment mode and determine booking status
-     */
-    private BookingStatus processPaymentAndDetermineStatus(Booking booking, BookingRequestDTO request) {
-        return switch (request.paymentMode()) {
-            case DIGITAL_WALLET -> {
-                log.info("Digital wallet payment - confirming booking immediately");
-                yield BookingStatus.CONFIRMED;
-            }
-            case CREDIT_CARD -> {
-                log.info("Credit card payment - validating with external service");
-                boolean isApproved = creditCardValidationClient.validatePayment(request.paymentReference());
-                if (isApproved) {
-                    log.info("Credit card payment APPROVED for booking {}", booking.getBookingId());
-                    yield BookingStatus.CONFIRMED;
-                } else {
-                    log.error("Credit card payment REJECTED for booking {}", booking.getBookingId());
-                    throw new PaymentFailedException("Credit card payment was not approved");
-                }
-            }
-            case BANK_TRANSFER -> {
-                log.info("Bank transfer payment - creating booking with PENDING_PAYMENT status");
-                yield BookingStatus.PENDING_PAYMENT;
-            }
-        };
     }
 
     /**

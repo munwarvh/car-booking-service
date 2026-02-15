@@ -2,13 +2,14 @@ package com.velocity.carservice.application.service;
 
 import com.velocity.carservice.application.dto.request.BookingRequestDTO;
 import com.velocity.carservice.application.dto.response.BookingResponseDTO;
+import com.velocity.carservice.application.strategy.PaymentStrategy;
+import com.velocity.carservice.application.strategy.PaymentStrategyFactory;
 import com.velocity.carservice.domain.model.Booking;
 import com.velocity.carservice.domain.model.BookingStatus;
 import com.velocity.carservice.domain.model.PaymentMode;
 import com.velocity.carservice.domain.model.VehicleCategory;
 import com.velocity.carservice.domain.repository.BookingRepository;
 import com.velocity.carservice.domain.service.BookingDomainService;
-import com.velocity.carservice.infrastructure.adapter.outbound.rest.CreditCardValidationClient;
 import com.velocity.carservice.infrastructure.exception.CustomExceptions.BookingNotFoundException;
 import com.velocity.carservice.infrastructure.exception.CustomExceptions.PaymentFailedException;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +44,10 @@ class BookingServiceTest {
     private BookingDomainService bookingDomainService;
 
     @Mock
-    private CreditCardValidationClient creditCardValidationClient;
+    private PaymentStrategyFactory paymentStrategyFactory;
+
+    @Mock
+    private PaymentStrategy paymentStrategy;
 
     @InjectMocks
     private BookingService bookingService;
@@ -73,6 +77,8 @@ class BookingServiceTest {
         void shouldConfirmBookingImmediatelyForDigitalWallet() {
             // Arrange
             when(bookingDomainService.generateBookingId()).thenReturn("BKG0000001");
+            when(paymentStrategyFactory.getStrategy(PaymentMode.DIGITAL_WALLET)).thenReturn(paymentStrategy);
+            when(paymentStrategy.processPayment(any(Booking.class), anyString())).thenReturn(BookingStatus.CONFIRMED);
             when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
             // Act
@@ -85,7 +91,8 @@ class BookingServiceTest {
 
             verify(bookingDomainService).validateRentalDates(any(), any());
             verify(bookingDomainService).validateVehicleId(anyString());
-            verify(creditCardValidationClient, never()).validatePayment(anyString());
+            verify(paymentStrategyFactory).getStrategy(PaymentMode.DIGITAL_WALLET);
+            verify(paymentStrategy).processPayment(any(Booking.class), eq("PAY-REF-001"));
         }
     }
 
@@ -109,7 +116,8 @@ class BookingServiceTest {
             );
 
             when(bookingDomainService.generateBookingId()).thenReturn("BKG0000002");
-            when(creditCardValidationClient.validatePayment("CC-REF-001")).thenReturn(true);
+            when(paymentStrategyFactory.getStrategy(PaymentMode.CREDIT_CARD)).thenReturn(paymentStrategy);
+            when(paymentStrategy.processPayment(any(Booking.class), anyString())).thenReturn(BookingStatus.CONFIRMED);
             when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
             // Act
@@ -117,7 +125,8 @@ class BookingServiceTest {
 
             // Assert
             assertThat(response.bookingStatus()).isEqualTo(BookingStatus.CONFIRMED);
-            verify(creditCardValidationClient).validatePayment("CC-REF-001");
+            verify(paymentStrategyFactory).getStrategy(PaymentMode.CREDIT_CARD);
+            verify(paymentStrategy).processPayment(any(Booking.class), eq("CC-REF-001"));
         }
 
         @Test
@@ -136,7 +145,9 @@ class BookingServiceTest {
             );
 
             when(bookingDomainService.generateBookingId()).thenReturn("BKG0000003");
-            when(creditCardValidationClient.validatePayment("REJECT-001")).thenReturn(false);
+            when(paymentStrategyFactory.getStrategy(PaymentMode.CREDIT_CARD)).thenReturn(paymentStrategy);
+            when(paymentStrategy.processPayment(any(Booking.class), anyString()))
+                    .thenThrow(new PaymentFailedException("Credit card payment was not approved"));
 
             // Act & Assert
             assertThatThrownBy(() -> bookingService.confirmBooking(creditCardRequest))
@@ -167,6 +178,8 @@ class BookingServiceTest {
             );
 
             when(bookingDomainService.generateBookingId()).thenReturn("BKG0000004");
+            when(paymentStrategyFactory.getStrategy(PaymentMode.BANK_TRANSFER)).thenReturn(paymentStrategy);
+            when(paymentStrategy.processPayment(any(Booking.class), anyString())).thenReturn(BookingStatus.PENDING_PAYMENT);
             when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
             // Act
@@ -174,7 +187,8 @@ class BookingServiceTest {
 
             // Assert
             assertThat(response.bookingStatus()).isEqualTo(BookingStatus.PENDING_PAYMENT);
-            verify(creditCardValidationClient, never()).validatePayment(anyString());
+            verify(paymentStrategyFactory).getStrategy(PaymentMode.BANK_TRANSFER);
+            verify(paymentStrategy).processPayment(any(Booking.class), eq("BT-REF-001"));
         }
 
         @Test
@@ -307,4 +321,3 @@ class BookingServiceTest {
         }
     }
 }
-
