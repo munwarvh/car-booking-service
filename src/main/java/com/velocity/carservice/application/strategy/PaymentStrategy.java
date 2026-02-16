@@ -4,10 +4,6 @@ import com.velocity.carservice.domain.model.Booking;
 import com.velocity.carservice.domain.model.BookingStatus;
 import com.velocity.carservice.domain.model.PaymentMode;
 
-/**
- * Strategy interface for processing different payment modes.
- * Implementations handle the specific logic for each payment type.
- */
 public interface PaymentStrategy {
 
     /**

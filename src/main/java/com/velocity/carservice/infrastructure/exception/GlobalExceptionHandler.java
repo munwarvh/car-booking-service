@@ -14,19 +14,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Global exception handler for the Car Booking Service.
- * Provides consistent error responses across all endpoints.
- *
- * Exception categories:
- * - Business exceptions: Expected errors from business rule violations (4xx)
- * - System exceptions: Unexpected errors from infrastructure/external services (5xx)
- */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-
-    // ==================== BUSINESS EXCEPTIONS (4xx) ====================
 
     /**
      * Handle booking not found - 404
@@ -158,7 +148,7 @@ public class GlobalExceptionHandler {
                 ErrorCode.INTERNAL_SERVER_ERROR, request.getRequestURI());
     }
 
-    // ==================== HELPER METHODS ====================
+
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status, String message, ErrorCode errorCode, String path) {
@@ -172,12 +162,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(response);
     }
 
-    // ==================== ERROR CODES ====================
 
-    /**
-     * Enum of all error codes for consistent error identification.
-     * Clients can use these codes for programmatic error handling.
-     */
+
     public enum ErrorCode {
         // Business errors (4xx)
         BOOKING_NOT_FOUND,
@@ -191,19 +177,7 @@ public class GlobalExceptionHandler {
         INTERNAL_SERVER_ERROR
     }
 
-    // ==================== RESPONSE DTOs ====================
 
-    /**
-     * Standard error response structure.
-     * Example:
-     * {
-     *   "timestamp": "2026-02-14T10:20:30",
-     *   "status": 422,
-     *   "errorCode": "PAYMENT_REJECTED",
-     *   "message": "Credit card payment was rejected",
-     *   "path": "/api/v1/bookings/confirm"
-     * }
-     */
     public record ErrorResponse(
             LocalDateTime timestamp,
             int status,

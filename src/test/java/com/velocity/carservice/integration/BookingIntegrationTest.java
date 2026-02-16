@@ -117,8 +117,7 @@ class BookingIntegrationTest {
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(10),
                     PaymentMode.DIGITAL_WALLET,
-                    "WALLET-INT-001",
-                    new BigDecimal("299.99")
+                    "WALLET-INT-001"
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -152,8 +151,7 @@ class BookingIntegrationTest {
                     LocalDate.now().plusDays(7),
                     LocalDate.now().plusDays(14),
                     PaymentMode.BANK_TRANSFER,
-                    "BT-INT-001",
-                    new BigDecimal("450.00")
+                    "BT-INT-001"
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -181,8 +179,7 @@ class BookingIntegrationTest {
                     LocalDate.now().plusDays(10),
                     LocalDate.now().plusDays(15),
                     PaymentMode.BANK_TRANSFER,
-                    "BT-KAFKA-001",
-                    new BigDecimal("200.00")
+                    "BT-KAFKA-001"
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -235,8 +232,7 @@ class BookingIntegrationTest {
                     LocalDate.now().plusDays(3),
                     LocalDate.now().plusDays(5),
                     PaymentMode.DIGITAL_WALLET,
-                    "WALLET-GET-001",
-                    new BigDecimal("599.99")
+                    "WALLET-GET-001"
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -286,8 +282,7 @@ class BookingIntegrationTest {
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(8),
                     PaymentMode.BANK_TRANSFER,
-                    "BT-CANCEL-001",
-                    new BigDecimal("150.00")
+                    "BT-CANCEL-001"
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -328,8 +323,7 @@ class BookingIntegrationTest {
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(30), // 25 days - exceeds 21 day limit
                     PaymentMode.DIGITAL_WALLET,
-                    "WALLET-VAL-001",
-                    new BigDecimal("1000.00")
+                    "WALLET-VAL-001"
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -356,8 +350,7 @@ class BookingIntegrationTest {
                     LocalDate.now().plusDays(10),
                     LocalDate.now().plusDays(5), // End date before start date
                     PaymentMode.DIGITAL_WALLET,
-                    "WALLET-VAL-002",
-                    new BigDecimal("500.00")
+                    "WALLET-VAL-002"
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -383,8 +376,7 @@ class BookingIntegrationTest {
                         "rentalStartDate": "2026-03-01",
                         "rentalEndDate": "2026-03-05",
                         "paymentMode": "DIGITAL_WALLET",
-                        "paymentReference": "WALLET-VAL-003",
-                        "paymentAmount": 250.00
+                        "paymentReference": "WALLET-VAL-003"
                     }
                     """;
 

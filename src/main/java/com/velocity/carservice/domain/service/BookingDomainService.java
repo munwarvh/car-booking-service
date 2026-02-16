@@ -51,7 +51,6 @@ public class BookingDomainService {
         if (vehicleId == null || vehicleId.isBlank()) {
             throw new BookingValidationException("Vehicle ID is required");
         }
-        // Mock validation - assume valid format
         log.debug("Vehicle ID {} validated successfully", vehicleId);
     }
 
@@ -83,7 +82,7 @@ public class BookingDomainService {
         if (booking.isFullPaymentReceived()) {
             return false;
         }
-        // Cancel if we are within 48 hours (2 days) of rental start
+
         LocalDate cancellationDeadline = booking.getRentalStartDate().minusDays(2);
         return !LocalDate.now().isBefore(cancellationDeadline);
     }

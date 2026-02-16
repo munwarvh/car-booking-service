@@ -30,24 +30,12 @@ public interface JpaBookingRepository extends JpaRepository<Booking, UUID> {
 
     boolean existsByBookingId(String bookingId);
 
-    /**
-     * Batch update status for multiple bookings in a single query.
-     * Much more efficient than updating one by one.
-     */
     @Modifying
     @Query("UPDATE Booking b SET b.status = :newStatus, b.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE b.bookingId IN :bookingIds")
     int batchUpdateStatus(@Param("bookingIds") List<String> bookingIds,
                           @Param("newStatus") BookingStatus newStatus);
 
-    /**
-     * Find booking IDs for auto-cancellation.
-     * Returns only IDs (lightweight) for bookings that:
-     * - Are BANK_TRANSFER payments
-     * - Have PENDING_PAYMENT status
-     * - Rental starts within specified days
-     * - Payment not fully received
-     */
     @Query("SELECT b.bookingId FROM Booking b " +
            "WHERE b.paymentMode = 'BANK_TRANSFER' " +
            "AND b.status = 'PENDING_PAYMENT' " +

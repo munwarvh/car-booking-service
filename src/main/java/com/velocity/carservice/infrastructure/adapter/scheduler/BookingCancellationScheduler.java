@@ -7,11 +7,6 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-/**
- * Scheduler for booking cancellation tasks.
- * This is an infrastructure component that handles scheduling concerns only.
- * Business logic is delegated to BookingCancellationService.
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -19,10 +14,6 @@ public class BookingCancellationScheduler {
 
     private final BookingCancellationService bookingCancellationService;
 
-    /**
-     * Scheduled task to cancel unpaid bank transfer bookings.
-     * Runs at a configurable interval and uses ShedLock for distributed locking.
-     */
     @Scheduled(fixedRateString = "${app.scheduler.cancellation-check-interval:3600000}")
     @SchedulerLock(
             name = "cancelUnpaidBankTransferBookings",

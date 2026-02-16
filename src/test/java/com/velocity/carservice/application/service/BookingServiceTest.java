@@ -63,8 +63,7 @@ class BookingServiceTest {
                 LocalDate.now().plusDays(5),
                 LocalDate.now().plusDays(10),
                 PaymentMode.DIGITAL_WALLET,
-                "PAY-REF-001",
-                new BigDecimal("250.00")
+                "PAY-REF-001"
         );
     }
 
@@ -111,8 +110,7 @@ class BookingServiceTest {
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(10),
                     PaymentMode.CREDIT_CARD,
-                    "CC-REF-001",
-                    new BigDecimal("450.00")
+                    "CC-REF-001"
             );
 
             when(bookingDomainService.generateBookingId()).thenReturn("BKG0000002");
@@ -140,8 +138,7 @@ class BookingServiceTest {
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(10),
                     PaymentMode.CREDIT_CARD,
-                    "REJECT-001",
-                    new BigDecimal("800.00")
+                    "REJECT-001"
             );
 
             when(bookingDomainService.generateBookingId()).thenReturn("BKG0000003");
@@ -173,8 +170,7 @@ class BookingServiceTest {
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(10),
                     PaymentMode.BANK_TRANSFER,
-                    "BT-REF-001",
-                    new BigDecimal("150.00")
+                    "BT-REF-001"
             );
 
             when(bookingDomainService.generateBookingId()).thenReturn("BKG0000004");

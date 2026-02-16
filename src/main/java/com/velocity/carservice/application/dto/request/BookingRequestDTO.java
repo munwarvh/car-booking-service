@@ -4,7 +4,6 @@ import com.velocity.carservice.domain.model.PaymentMode;
 import com.velocity.carservice.domain.model.VehicleCategory;
 import jakarta.validation.constraints.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record BookingRequestDTO(
@@ -30,11 +29,6 @@ public record BookingRequestDTO(
         PaymentMode paymentMode,
 
         @NotBlank(message = "Payment reference is required")
-        String paymentReference,
-
-        @NotNull(message = "Payment amount is required")
-        @DecimalMin(value = "0.01", message = "Payment amount must be greater than 0")
-        @Digits(integer = 8, fraction = 2, message = "Invalid amount format")
-        BigDecimal paymentAmount
+        String paymentReference
 ) {
 }

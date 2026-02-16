@@ -16,8 +16,6 @@ public record BankTransferPaymentEvent(
         if (transactionDetails == null || transactionDetails.length() < 23) {
             return null;
         }
-        // Transaction details format: "TXN987654321 BKG0012345"
-        // BookingId starts at position 13 (after 12 char TxnRef + 1 space)
         return transactionDetails.substring(13).trim();
     }
 

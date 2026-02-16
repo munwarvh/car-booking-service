@@ -30,16 +30,12 @@ public class BookingService {
         log.info("Processing booking request for customer: {}, payment mode: {}",
                 request.customerName(), request.paymentMode());
 
-        // Validate rental dates (end date after start, max 21 days)
         bookingDomainService.validateRentalDates(request.rentalStartDate(), request.rentalEndDate());
 
-        // Validate vehicle ID
         bookingDomainService.validateVehicleId(request.vehicleId());
 
-        // Generate unique booking ID
         String bookingId = bookingDomainService.generateBookingId();
 
-        // Create booking entity using builder pattern
         Booking booking = Booking.builder()
                 .bookingId(bookingId)
                 .customerName(request.customerName())
@@ -49,16 +45,12 @@ public class BookingService {
                 .rentalEndDate(request.rentalEndDate())
                 .paymentMode(request.paymentMode())
                 .paymentReference(request.paymentReference())
-                .paymentAmount(request.paymentAmount())
-                .amountReceived(BigDecimal.ZERO)
                 .build();
 
-        // Process payment using Strategy pattern
         PaymentStrategy paymentStrategy = paymentStrategyFactory.getStrategy(request.paymentMode());
         BookingStatus status = paymentStrategy.processPayment(booking, request.paymentReference());
         booking.setStatus(status);
 
-        // Save booking
         Booking savedBooking = bookingRepository.save(booking);
         log.info("Booking {} created with status: {}", savedBooking.getBookingId(), savedBooking.getStatus());
 
@@ -79,7 +71,6 @@ public class BookingService {
             return;
         }
 
-        // Update amount received
         BigDecimal totalReceived = booking.getAmountReceived() != null
                 ? booking.getAmountReceived().add(amountReceived)
                 : amountReceived;

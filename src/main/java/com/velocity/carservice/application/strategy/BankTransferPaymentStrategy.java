@@ -6,11 +6,6 @@ import com.velocity.carservice.domain.model.PaymentMode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-/**
- * Payment strategy for Bank Transfer payments.
- * Bank transfers are asynchronous - booking is created with PENDING_PAYMENT status
- * and confirmed when payment is received via Kafka events.
- */
 @Component
 @Slf4j
 public class BankTransferPaymentStrategy implements PaymentStrategy {

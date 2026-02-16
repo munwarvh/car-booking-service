@@ -22,7 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -68,9 +67,7 @@ class BookingControllerTest {
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(10),
                     PaymentMode.DIGITAL_WALLET,
-                    "WALLET-123",
-                    new BigDecimal("250.00")
-            );
+                    "WALLET-123");
 
             BookingResponseDTO response = new BookingResponseDTO("BKG0000001", BookingStatus.CONFIRMED);
             when(bookingService.confirmBooking(any(BookingRequestDTO.class))).thenReturn(response);
@@ -95,9 +92,7 @@ class BookingControllerTest {
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(10),
                     PaymentMode.BANK_TRANSFER,
-                    "BT-REF-001",
-                    new BigDecimal("150.00")
-            );
+                    "BT-REF-001");
 
             BookingResponseDTO response = new BookingResponseDTO("BKG0000002", BookingStatus.PENDING_PAYMENT);
             when(bookingService.confirmBooking(any(BookingRequestDTO.class))).thenReturn(response);
@@ -122,9 +117,7 @@ class BookingControllerTest {
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(10),
                     PaymentMode.CREDIT_CARD,
-                    "REJECT-123",
-                    new BigDecimal("800.00")
-            );
+                    "REJECT-123");
 
             when(bookingService.confirmBooking(any(BookingRequestDTO.class)))
                     .thenThrow(new PaymentFailedException("Credit card payment was not approved"));
@@ -148,8 +141,7 @@ class BookingControllerTest {
                         "rentalStartDate": "2026-03-01",
                         "rentalEndDate": "2026-03-05",
                         "paymentMode": "DIGITAL_WALLET",
-                        "paymentReference": "PAY-001",
-                        "paymentAmount": 250.00
+                        "paymentReference": "PAY-001"
                     }
                     """;
 
