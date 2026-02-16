@@ -2,7 +2,11 @@ package com.velocity.carservice.application.dto.request;
 
 import com.velocity.carservice.domain.model.PaymentMode;
 import com.velocity.carservice.domain.model.VehicleCategory;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 

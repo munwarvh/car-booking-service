@@ -8,7 +8,7 @@ import com.velocity.carservice.domain.model.Booking;
 import com.velocity.carservice.domain.model.BookingStatus;
 import com.velocity.carservice.domain.repository.BookingRepository;
 import com.velocity.carservice.domain.service.BookingDomainService;
-import com.velocity.carservice.infrastructure.exception.CustomExceptions.*;
+import com.velocity.carservice.infrastructure.exception.CustomExceptions.BookingNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
