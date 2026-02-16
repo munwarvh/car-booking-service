@@ -9,8 +9,12 @@ import com.velocity.carservice.domain.model.BookingStatus;
 import com.velocity.carservice.domain.repository.BookingRepository;
 import com.velocity.carservice.domain.service.BookingDomainService;
 import com.velocity.carservice.infrastructure.exception.CustomExceptions.BookingNotFoundException;
+import com.velocity.carservice.infrastructure.metrics.BookingMetrics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +26,17 @@ import java.math.BigDecimal;
 @Transactional
 public class BookingService {
 
+    private static final String BOOKINGS_CACHE = "bookings";
+
     private final BookingRepository bookingRepository;
     private final BookingDomainService bookingDomainService;
     private final PaymentStrategyFactory paymentStrategyFactory;
+    private final BookingMetrics bookingMetrics;
 
+    @CachePut(value = BOOKINGS_CACHE, key = "#result.bookingId()")
     public BookingResponseDTO confirmBooking(BookingRequestDTO request) {
+        long startTime = System.currentTimeMillis();
+
         log.info("Processing booking request for customer: {}, payment mode: {}",
                 request.customerName(), request.paymentMode());
 
@@ -52,6 +62,15 @@ public class BookingService {
         booking.setStatus(status);
 
         Booking savedBooking = bookingRepository.save(booking);
+
+        // Record metrics
+        bookingMetrics.incrementBookingsCreated(request.paymentMode(), request.vehicleCategory());
+        bookingMetrics.recordBookingCreationTime(System.currentTimeMillis() - startTime);
+
+        if (status == BookingStatus.CONFIRMED) {
+            bookingMetrics.incrementBookingsConfirmed(request.paymentMode());
+        }
+
         log.info("Booking {} created with status: {}", savedBooking.getBookingId(), savedBooking.getStatus());
 
         return new BookingResponseDTO(savedBooking.getBookingId(), savedBooking.getStatus());
@@ -60,6 +79,7 @@ public class BookingService {
     /**
      * Processes bank transfer payment received via Kafka event
      */
+    @CacheEvict(value = BOOKINGS_CACHE, key = "#bookingId")
     public void processBankTransferPayment(String bookingId, BigDecimal amountReceived) {
         log.info("Processing bank transfer payment for booking: {}, amount: {}", bookingId, amountReceived);
 
@@ -89,18 +109,21 @@ public class BookingService {
     }
 
     /**
-     * Get booking by booking ID
+     * Get booking by booking ID - cached for performance
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = BOOKINGS_CACHE, key = "#bookingId")
     public BookingResponseDTO getBookingById(String bookingId) {
+        log.info("Fetching booking from database: {}", bookingId);
         Booking booking = bookingRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found: " + bookingId));
         return new BookingResponseDTO(booking.getBookingId(), booking.getStatus());
     }
 
     /**
-     * Cancel a booking
+     * Cancel a booking - evicts from cache
      */
+    @CacheEvict(value = BOOKINGS_CACHE, key = "#bookingId")
     public BookingResponseDTO cancelBooking(String bookingId) {
         log.info("Cancelling booking: {}", bookingId);
 

@@ -3,6 +3,7 @@ package com.velocity.carservice.application.service;
 import com.velocity.carservice.domain.model.Booking;
 import com.velocity.carservice.domain.model.BookingStatus;
 import com.velocity.carservice.domain.repository.BookingRepository;
+import com.velocity.carservice.infrastructure.metrics.BookingMetrics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class BookingCancellationService {
     private static final int DAYS_BEFORE_RENTAL_FOR_CANCELLATION = 2;
 
     private final BookingRepository bookingRepository;
+    private final BookingMetrics bookingMetrics;
 
     @Transactional
     public int cancelUnpaidBankTransferBookings() {
@@ -35,6 +37,8 @@ public class BookingCancellationService {
 
         int cancelledCount = bookingRepository.batchUpdateStatus(bookingIdsToCancel, BookingStatus.CANCELLED);
 
+        bookingMetrics.incrementBookingsAutoCancelled(cancelledCount);
+
         log.info("Batch cancellation completed. Cancelled {} bookings", cancelledCount);
         return cancelledCount;
     }
@@ -46,6 +50,8 @@ public class BookingCancellationService {
 
         booking.cancel();
         bookingRepository.save(booking);
+
+        bookingMetrics.incrementBookingsCancelled();
 
         log.info("Booking {} cancelled due to unpaid bank transfer", booking.getBookingId());
     }

@@ -27,6 +27,9 @@ spring:
     consumer:
       group-id: car-booking-service
 
+  cache:
+    type: redis
+
   data:
     redis:
       host: redis

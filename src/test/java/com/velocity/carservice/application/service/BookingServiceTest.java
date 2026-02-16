@@ -12,6 +12,7 @@ import com.velocity.carservice.domain.repository.BookingRepository;
 import com.velocity.carservice.domain.service.BookingDomainService;
 import com.velocity.carservice.infrastructure.exception.CustomExceptions.BookingNotFoundException;
 import com.velocity.carservice.infrastructure.exception.CustomExceptions.PaymentFailedException;
+import com.velocity.carservice.infrastructure.metrics.BookingMetrics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -51,6 +52,9 @@ class BookingServiceTest {
 
     @Mock
     private PaymentStrategy paymentStrategy;
+
+    @Mock
+    private BookingMetrics bookingMetrics;
 
     @InjectMocks
     private BookingService bookingService;

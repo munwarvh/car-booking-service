@@ -6,6 +6,7 @@ import com.velocity.carservice.application.dto.event.BankTransferPaymentEvent;
 import com.velocity.carservice.application.service.BookingService;
 import com.velocity.carservice.domain.model.ProcessedPaymentEvent;
 import com.velocity.carservice.domain.model.ProcessedPaymentEvent.ProcessingStatus;
+import com.velocity.carservice.infrastructure.metrics.BookingMetrics;
 import com.velocity.carservice.infrastructure.repository.ProcessedPaymentEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class BankTransferPaymentEventConsumer {
     private final ObjectMapper objectMapper;
     private final ProcessedPaymentEventRepository processedPaymentEventRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final BookingMetrics bookingMetrics;
 
     @KafkaListener(
             topics = "${app.kafka.topics.bank-transfer-payment-events:bank-transfer-payment-events}",
@@ -44,6 +46,8 @@ public class BankTransferPaymentEventConsumer {
 
         log.info("Received message from topic={}, partition={}, offset={}", topic, partition, offset);
         log.debug("Message payload: {}", message);
+
+        bookingMetrics.incrementPaymentEventsReceived();
 
         BankTransferPaymentEvent event = null;
         String paymentId = null;
@@ -72,16 +76,21 @@ public class BankTransferPaymentEventConsumer {
 
             recordProcessedEvent(paymentId, bookingId, ProcessingStatus.SUCCESS, null);
 
+            bookingMetrics.incrementPaymentEventsProcessed();
+
             acknowledgment.acknowledge();
             log.info("Successfully processed payment event: paymentId={}, bookingId={}", paymentId, bookingId);
 
         } catch (JsonProcessingException e) {
+            bookingMetrics.incrementPaymentEventsFailed("invalid_json");
             handlePoisonMessage(message, "Invalid JSON format: " + e.getMessage(), acknowledgment);
 
         } catch (InvalidEventException e) {
+            bookingMetrics.incrementPaymentEventsFailed("schema_validation");
             handlePoisonMessage(message, "Schema validation failed: " + e.getMessage(), acknowledgment);
 
         } catch (Exception e) {
+            bookingMetrics.incrementPaymentEventsFailed("processing_error");
             handleProcessingError(event, paymentId, bookingId, message, e, acknowledgment);
         }
     }

@@ -5,7 +5,7 @@ import com.velocity.carservice.domain.model.BookingStatus;
 import com.velocity.carservice.domain.model.PaymentMode;
 import com.velocity.carservice.domain.model.VehicleCategory;
 import com.velocity.carservice.domain.repository.BookingRepository;
-import com.velocity.carservice.domain.service.BookingDomainService;
+import com.velocity.carservice.infrastructure.metrics.BookingMetrics;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +35,7 @@ class BookingCancellationServiceTest {
     private BookingRepository bookingRepository;
 
     @Mock
-    private BookingDomainService bookingDomainService;
+    private BookingMetrics bookingMetrics;
 
     @InjectMocks
     private BookingCancellationService cancellationService;

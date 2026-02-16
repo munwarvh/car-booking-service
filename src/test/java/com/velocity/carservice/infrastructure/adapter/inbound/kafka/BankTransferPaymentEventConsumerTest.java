@@ -3,6 +3,7 @@ package com.velocity.carservice.infrastructure.adapter.inbound.kafka;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.velocity.carservice.application.dto.event.BankTransferPaymentEvent;
 import com.velocity.carservice.application.service.BookingService;
+import com.velocity.carservice.infrastructure.metrics.BookingMetrics;
 import com.velocity.carservice.infrastructure.repository.ProcessedPaymentEventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +41,9 @@ class BankTransferPaymentEventConsumerTest {
 
     @Mock
     private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Mock
+    private BookingMetrics bookingMetrics;
 
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper();
